@@ -33,7 +33,7 @@ def random_apply(func, p, x):
           tf.cast(p, tf.float32)), lambda: func(x), lambda: x)
 
 
-def random_brightness(image, max_delta, impl='simclrv2'):
+def random_brightness(image, max_delta, impl='simclrv1'):
   """A multiplicative vs additive change of brightness."""
   if impl == 'simclrv2':
     factor = tf.random.uniform([], tf.maximum(1.0 - max_delta, 0),
@@ -448,7 +448,7 @@ def preprocess_for_train(image,
                          color_distort=True,
                          crop=True,
                          flip=True,
-                         impl='simclrv2'):
+                         impl='simclrv1'):
   """Preprocesses the given image for training.
 
   Args:
