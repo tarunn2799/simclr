@@ -464,6 +464,8 @@ def main(argv):
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
 
+  hub_module = hub_module = hub.load('style_transfer_content_weights_params')
+  style_dataset = tfds.load('dtd',  batch_size=50, split='train', decoders={'image': style_preprocessing_decoder(),})  
 
   builder = tfds.builder(FLAGS.dataset, data_dir=FLAGS.data_dir)
   builder.download_and_prepare()
@@ -520,7 +522,7 @@ def main(argv):
     with strategy.scope():
       # Build input pipeline.
       ds = data_lib.build_distributed_dataset(builder, FLAGS.train_batch_size,
-                                              True, strategy, topology)
+                                              True, strategy, topology, hub_module, style_ds)
 
       # Build LR schedule and optimizer.
       learning_rate = model_lib.WarmUpAndCosineDecay(FLAGS.learning_rate,

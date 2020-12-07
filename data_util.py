@@ -17,12 +17,15 @@
 
 import functools
 from absl import flags
-
+import random 
 import tensorflow.compat.v2 as tf
 
 FLAGS = flags.FLAGS
 
 CROP_PROPORTION = 0.875  # Standard for ImageNet.
+
+
+
 
 
 def random_apply(func, p, x):
@@ -32,6 +35,25 @@ def random_apply(func, p, x):
           tf.random.uniform([], minval=0, maxval=1, dtype=tf.float32),
           tf.cast(p, tf.float32)), lambda: func(x), lambda: x)
 
+
+
+
+def style_transfer(image, hub_module, style_ds):
+  styles = style_ds.__iter__().get_next()['image']
+  image = tf.image.resize(image, (256, 256))
+  style_image = styles[random.randint(0, 48)]
+  outputs = hub_module(tf.convert_to_tensor(content_image.numpy()[np.newaxis, ...]),
+                      tf.convert_to_tensor(style_image.numpy()[np.newaxis, ...]), 
+                      tf.convert_to_tensor(custom_ratio))
+  stylized_image = outputs[0]
+  image = tf.image.resize(stylized_image, (32,32))
+  return image
+
+def apply_style_transfer(image, hub_module, style_ds, p= 0.8):
+  def _transform(image):
+    image= style_transfer(image, hub_module, style_ds)
+    return image
+  return random_apply(_transform, p=p, x=image)
 
 def random_brightness(image, max_delta, impl='simclrv1'):
   """A multiplicative vs additive change of brightness."""
@@ -53,7 +75,7 @@ def to_grayscale(image, keep_channels=True):
   return image
 
 
-def color_jitter(image, strength, random_order=True, impl='simclrv2'):
+def color_jitter(image, strength, random_order=True, impl='simclrv1'):
   """Distorts the color of the image.
 
   Args:
@@ -83,7 +105,7 @@ def color_jitter_nonrand(image,
                          contrast=0,
                          saturation=0,
                          hue=0,
-                         impl='simclrv2'):
+                         impl='simclrv1'):
   """Distorts the color of the image (jittering order is fixed).
 
   Args:
@@ -124,7 +146,7 @@ def color_jitter_rand(image,
                       contrast=0,
                       saturation=0,
                       hue=0,
-                      impl='simclrv2'):
+                      impl='simclrv1'):
   """Distorts the color of the image (jittering order is random).
 
   Args:
@@ -233,6 +255,8 @@ def center_crop(image, height, width, crop_proportion):
   shape = tf.shape(image)
   image_height = shape[0]
   image_width = shape[1]
+  image_width = image_width.numpy()[np.newaxis(), ...]
+
   crop_height, crop_width = _compute_crop_shape(
       image_height, image_width, height / width, crop_proportion)
   offset_height = ((image_height - crop_height) + 1) // 2
@@ -382,7 +406,8 @@ def random_crop_with_resize(image, height, width, p=1.0):
   return random_apply(_transform, p=p, x=image)
 
 
-def random_color_jitter(image, p=1.0, impl='simclrv2'):
+
+def random_color_jitter(image, p=1.0, impl='simclrv1'):
 
   def _transform(image):
     color_jitter_t = functools.partial(
@@ -445,10 +470,8 @@ def batch_random_blur(images_list, height, width, blur_probability=0.5):
 def preprocess_for_train(image,
                          height,
                          width,
-                         color_distort=True,
-                         crop=True,
-                         flip=True,
-                         impl='simclrv1'):
+                         hub_module, 
+                         style_ds):
   """Preprocesses the given image for training.
 
   Args:
@@ -464,12 +487,13 @@ def preprocess_for_train(image,
   Returns:
     A preprocessed image `Tensor`.
   """
-  if crop:
-    image = random_crop_with_resize(image, height, width)
-  if flip:
-    image = tf.image.random_flip_left_right(image)
-  if color_distort:
-    image = random_color_jitter(image, impl=impl)
+  # if crop:
+  #   image = random_crop_with_resize(image, height, width)
+  # if flip:
+  #   image = tf.image.random_flip_left_right(image)
+  # if color_distort:
+  #   image = random_color_jitter(image, impl=impl)
+  image = apply_style_transfer(image, hub_module, style_ds)
   image = tf.reshape(image, [height, width, 3])
   image = tf.clip_by_value(image, 0., 1.)
   return image
@@ -495,7 +519,7 @@ def preprocess_for_eval(image, height, width, crop=True):
 
 
 def preprocess_image(image, height, width, is_training=False,
-                     color_distort=True, test_crop=True):
+                     color_distort=True, test_crop=True, hub_module= None, style_ds= None):
   """Preprocesses the given image.
 
   Args:
@@ -511,7 +535,8 @@ def preprocess_image(image, height, width, is_training=False,
     A preprocessed image `Tensor` of range [0, 1].
   """
   image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+  image= image / 255.0
   if is_training:
-    return preprocess_for_train(image, height, width, color_distort)
+    return preprocess_for_train(image, height, width, color_distort, hub_module, style_ds)
   else:
     return preprocess_for_eval(image, height, width, test_crop)

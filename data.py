@@ -25,7 +25,7 @@ import tensorflow.compat.v2 as tf
 FLAGS = flags.FLAGS
 
 
-def build_input_fn(builder, global_batch_size, topology, is_training):
+def build_input_fn(builder, global_batch_size, topology, is_training, hub_module, style_ds):
   """Build input function.
 
   Args:
@@ -44,7 +44,7 @@ def build_input_fn(builder, global_batch_size, topology, is_training):
     batch_size = input_context.get_per_replica_batch_size(global_batch_size)
     logging.info('Global batch size: %d', global_batch_size)
     logging.info('Per-replica batch size: %d', batch_size)
-    preprocess_fn_pretrain = get_preprocess_fn(is_training, is_pretrain=True)
+    preprocess_fn_pretrain = get_preprocess_fn(is_training, is_pretrain=True, hub_module, style_ds)
     preprocess_fn_finetune = get_preprocess_fn(is_training, is_pretrain=False)
     num_classes = builder.info.features['label'].num_classes
 
@@ -87,12 +87,12 @@ def build_input_fn(builder, global_batch_size, topology, is_training):
 
 
 def build_distributed_dataset(builder, batch_size, is_training, strategy,
-                              topology):
-  input_fn = build_input_fn(builder, batch_size, topology, is_training)
+                              topology, hub_module, style_ds):
+  input_fn = build_input_fn(builder, batch_size, topology, is_training, hub_module, style_ds)
   return strategy.experimental_distribute_datasets_from_function(input_fn)
 
 
-def get_preprocess_fn(is_training, is_pretrain):
+def get_preprocess_fn(is_training, is_pretrain, hub_module, style_ds):
   """Get function that accepts an image and returns a preprocessed image."""
   # Disable test cropping for small images (e.g. CIFAR)
   if FLAGS.image_size <= 32:
@@ -105,4 +105,6 @@ def get_preprocess_fn(is_training, is_pretrain):
       width=FLAGS.image_size,
       is_training=is_training,
       color_distort=is_pretrain,
-      test_crop=test_crop)
+      test_crop=test_crop, 
+      hub_module= hub_module, 
+      style_ds= style_ds)
