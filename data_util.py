@@ -42,6 +42,7 @@ def style_transfer(image, hub_module, style_ds):
   styles = style_ds.__iter__().get_next()['image']
   image = tf.image.resize(image, (256, 256))
   style_image = styles[random.randint(0, 48)]
+  custom_ratio = 0.7
   outputs = hub_module(tf.convert_to_tensor(content_image.numpy()[np.newaxis, ...]),
                       tf.convert_to_tensor(style_image.numpy()[np.newaxis, ...]), 
                       tf.convert_to_tensor(custom_ratio))
@@ -494,7 +495,7 @@ def preprocess_for_train(image,
   # if color_distort:
   #   image = random_color_jitter(image, impl=impl)
   image = apply_style_transfer(image, hub_module, style_ds)
-  image = tf.reshape(image, [height, width, 3])
+  # image = tf.reshape(image, [height, width, 3])
   image = tf.clip_by_value(image, 0., 1.)
   return image
 
