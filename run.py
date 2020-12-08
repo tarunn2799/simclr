@@ -28,7 +28,7 @@ import model as model_lib
 import objective as obj_lib
 import tensorflow.compat.v2 as tf
 import tensorflow_datasets as tfds
-
+import tensorflow_hub as hub
 
 
 FLAGS = flags.FLAGS
@@ -459,12 +459,19 @@ def _restore_latest_or_from_pretrain(checkpoint_manager):
       for x in output_layer_parameters:
         x.assign(tf.zeros_like(x))
 
+@tfds.decode.make_decoder()
+def style_preprocessing_decoder(serialized_image, feature):
+    target_height, target_width = style_img_size[0], style_img_size[1]
+    serialized_image = tf.io.decode_png(serialized_image)
+    serialized_image = tf.image.resize_with_crop_or_pad(serialized_image, target_height, target_width)
+    serialized_image = tf.cast(serialized_image, tf.float32)
+    return serialized_image / 255.0
 
 def main(argv):
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
 
-  hub_module = hub_module = hub.load('style_transfer_content_weights_params')
+  hub_module = hub.load('style_transfer_content_weights_params')
   style_dataset = tfds.load('dtd',  batch_size=50, split='train', decoders={'image': style_preprocessing_decoder(),})  
 
   builder = tfds.builder(FLAGS.dataset, data_dir=FLAGS.data_dir)
@@ -521,8 +528,9 @@ def main(argv):
     summary_writer = tf.summary.create_file_writer(FLAGS.model_dir)
     with strategy.scope():
       # Build input pipeline.
+      data_lib.build_distributed_dataset()
       ds = data_lib.build_distributed_dataset(builder, FLAGS.train_batch_size,
-                                              True, strategy, topology, hub_module, style_ds)
+                                              True, strategy, topology, hub_module, style_dataset)
 
       # Build LR schedule and optimizer.
       learning_rate = model_lib.WarmUpAndCosineDecay(FLAGS.learning_rate,
