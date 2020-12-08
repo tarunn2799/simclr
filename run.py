@@ -528,7 +528,6 @@ def main(argv):
     summary_writer = tf.summary.create_file_writer(FLAGS.model_dir)
     with strategy.scope():
       # Build input pipeline.
-      data_lib.build_distributed_dataset()
       ds = data_lib.build_distributed_dataset(builder, FLAGS.train_batch_size,
                                               True, strategy, topology, hub_module, style_dataset)
 
