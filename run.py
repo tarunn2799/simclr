@@ -461,7 +461,7 @@ def _restore_latest_or_from_pretrain(checkpoint_manager):
 
 @tfds.decode.make_decoder()
 def style_preprocessing_decoder(serialized_image, feature):
-    target_height, target_width = style_img_size[0], style_img_size[1]
+    target_height, target_width = 256, 256
     serialized_image = tf.io.decode_png(serialized_image)
     serialized_image = tf.image.resize_with_crop_or_pad(serialized_image, target_height, target_width)
     serialized_image = tf.cast(serialized_image, tf.float32)
