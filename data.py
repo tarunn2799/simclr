@@ -45,7 +45,7 @@ def build_input_fn(builder, global_batch_size, topology, is_training, hub_module
     logging.info('Global batch size: %d', global_batch_size)
     logging.info('Per-replica batch size: %d', batch_size)
     preprocess_fn_pretrain = get_preprocess_fn(is_training, True, hub_module, style_ds)
-    preprocess_fn_finetune = get_preprocess_fn(is_training, is_pretrain=False)
+    preprocess_fn_finetune = get_preprocess_fn(is_training, is_pretrain=False, hub_module= None, style_ds= None)
     num_classes = builder.info.features['label'].num_classes
 
     def map_fn(image, label):
