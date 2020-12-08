@@ -30,7 +30,6 @@ import tensorflow.compat.v2 as tf
 import tensorflow_datasets as tfds
 import tensorflow_hub as hub
 
-tf.config.run_functions_eagerly(True)
 
 print("TensorFlow Version used:", tf.__version__)
 
