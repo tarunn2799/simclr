@@ -38,7 +38,7 @@ def style_transfer(image, hub_module, style_ds):
   image = tf.image.resize(image, (256, 256))
   style_image = styles[random.randint(0, 48)]
   custom_ratio = 0.7
-  outputs = hub_module(tf.convert_to_tensor(content_image.numpy()[np.newaxis, ...]),
+  outputs = hub_module(tf.convert_to_tensor(image.numpy()[np.newaxis, ...]),
                       tf.convert_to_tensor(style_image.numpy()[np.newaxis, ...]), 
                       tf.convert_to_tensor(custom_ratio))
   stylized_image = outputs[0]
