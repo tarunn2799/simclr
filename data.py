@@ -44,7 +44,7 @@ def build_input_fn(builder, global_batch_size, topology, is_training, hub_module
     batch_size = input_context.get_per_replica_batch_size(global_batch_size)
     logging.info('Global batch size: %d', global_batch_size)
     logging.info('Per-replica batch size: %d', batch_size)
-    preprocess_fn_pretrain = get_preprocess_fn(is_training, is_pretrain=True, hub_module, style_ds)
+    preprocess_fn_pretrain = get_preprocess_fn(is_training, True, hub_module, style_ds)
     preprocess_fn_finetune = get_preprocess_fn(is_training, is_pretrain=False)
     num_classes = builder.info.features['label'].num_classes
 
