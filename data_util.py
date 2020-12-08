@@ -533,6 +533,6 @@ def preprocess_image(image, height, width, is_training=False,
   image = tf.image.convert_image_dtype(image, dtype=tf.float32)
   image= image / 255.0
   if is_training:
-    return preprocess_for_train(image, height, width, color_distort, hub_module, style_ds)
+    return preprocess_for_train(image, height, width, hub_module, style_ds)
   else:
     return preprocess_for_eval(image, height, width, test_crop)
