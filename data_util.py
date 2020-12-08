@@ -24,10 +24,6 @@ FLAGS = flags.FLAGS
 
 CROP_PROPORTION = 0.875  # Standard for ImageNet.
 
-
-
-
-
 def random_apply(func, p, x):
   """Randomly apply function func to x with probability p."""
   return tf.cond(
@@ -35,8 +31,7 @@ def random_apply(func, p, x):
           tf.random.uniform([], minval=0, maxval=1, dtype=tf.float32),
           tf.cast(p, tf.float32)), lambda: func(x), lambda: x)
 
-
-
+# Style transfer augmentation
 
 def style_transfer(image, hub_module, style_ds):
   styles = style_ds.__iter__().get_next()['image']
