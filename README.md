@@ -1,5 +1,4 @@
-# TF2 implementation of SimCLR
-
+# SimCLR
 This implementation is based on TensorFlow 2.x. We use `tf.keras` layers for building the model and use `tf.data` for our input pipeline. The model is trained using a [custom training loop](https://www.tensorflow.org/tutorials/distribute/custom_training) with `tf.distribute` on multiple TPUs.
 
 <div align="center">
