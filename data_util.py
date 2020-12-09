@@ -34,16 +34,16 @@ def random_apply(func, p, x):
 # Style transfer augmentation
 
 def style_transfer(image, hub_module, style_ds):
-  styles = style_ds.__iter__().get_next()['image']
-  image = tf.image.resize(image, (256, 256))
-  style_image = styles[random.randint(0, 48)]
-  custom_ratio = 0.7
-  outputs = hub_module(tf.convert_to_tensor(tf.expand_dims(image, axis= 0)),
-                       tf.convert_to_tensor(tf.expand_dims(style_image, axis= 0)))
-                      #  tf.convert_to_tensor(custom_ratio))
-  print("INFERENCE DONE")
-  stylized_image = outputs[0]
-  image = tf.image.resize(stylized_image, (32,32))
+  # styles = style_ds.__iter__().get_next()['image']
+  # image = tf.image.resize(image, (256, 256))
+  # style_image = styles[random.randint(0, 48)]
+  # custom_ratio = 0.7
+  # outputs = hub_module(tf.convert_to_tensor(tf.expand_dims(image, axis= 0)),
+  #                      tf.convert_to_tensor(tf.expand_dims(style_image, axis= 0)))
+  #                     #  tf.convert_to_tensor(custom_ratio))
+  # print("INFERENCE DONE")
+  # stylized_image = outputs[0]
+  # image = tf.image.resize(stylized_image, (32,32))
   return image
 
 def apply_style_transfer(image, hub_module, style_ds, p= 0.8):
