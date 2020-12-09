@@ -41,6 +41,7 @@ def style_transfer(image, hub_module, style_ds):
   outputs = hub_module(tf.convert_to_tensor(tf.expand_dims(image, axis= 0)),
                        tf.convert_to_tensor(tf.expand_dims(style_image, axis= 0)))
                       #  tf.convert_to_tensor(custom_ratio))
+  print("INFERENCE DONE")
   stylized_image = outputs[0]
   image = tf.image.resize(stylized_image, (32,32))
   return image
