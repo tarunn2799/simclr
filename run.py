@@ -473,7 +473,8 @@ def main(argv):
   if len(argv) > 1:
     raise app.UsageError('Too many command-line arguments.')
 
-  hub_module = hub.load('style_transfer_content_weights_params')
+  # hub_module = hub.load('style_transfer_content_weights_params')
+  hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
   style_dataset = tfds.load('dtd',  batch_size=50, split='train', decoders={'image': style_preprocessing_decoder(),})  
 
   builder = tfds.builder(FLAGS.dataset, data_dir=FLAGS.data_dir)
