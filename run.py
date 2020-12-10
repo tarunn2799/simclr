@@ -519,6 +519,7 @@ def main(argv):
 
   with strategy.scope():
     model = model_lib.Model(num_classes)
+    print("GOT MODEL")
 
   if FLAGS.mode == 'eval':
     for ckpt in tf.train.checkpoints_iterator(
