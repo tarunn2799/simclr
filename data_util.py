@@ -536,5 +536,7 @@ def preprocess_image(image, height, width, is_training=False,
   image= image / 255.0
   if is_training:
     return preprocess_for_train(image, height, width, hub_module, style_ds)
+    print("PREPROCESSING FUNCTION FOR TRAIN SUCCESSFUL")
   else:
     return preprocess_for_eval(image, height, width, test_crop)
+    print("PREPROCESSING FUNCTION FOR EVAL SUCCESSFUL")

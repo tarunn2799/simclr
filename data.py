@@ -95,6 +95,8 @@ def build_distributed_dataset(builder, batch_size, is_training, strategy,
 def get_preprocess_fn(is_training, is_pretrain, hub_module, style_ds):
   """Get function that accepts an image and returns a preprocessed image."""
   # Disable test cropping for small images (e.g. CIFAR)
+  print("GET_PREPROCESS_FN CALLED")
+
   if FLAGS.image_size <= 32:
     test_crop = False
   else:
