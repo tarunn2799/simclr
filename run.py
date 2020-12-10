@@ -474,6 +474,7 @@ def main(argv):
     raise app.UsageError('Too many command-line arguments.')
 
   # hub_module = hub.load('style_transfer_content_weights_params')
+  print("LOADING TF-HUB MODULE")
   hub_module = hub.load('https://tfhub.dev/google/magenta/arbitrary-image-stylization-v1-256/2')
   style_dataset = tfds.load('dtd',  batch_size=50, split='train', decoders={'image': style_preprocessing_decoder(),})  
 
